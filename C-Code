@@ -1,0 +1,454 @@
+#include<stdio.h>
+#include<conio.h>
+#include<string.h>
+#include<stdlib.h>
+
+
+
+
+
+struct details
+{
+	char un[50],ps[50],phone[20];
+    int hn;
+    char city[20];
+
+
+};
+
+
+
+
+struct detail
+{
+	char un1[50];
+	float t;
+};
+
+
+
+void reg();
+void login();
+void menu(char []);
+float cal(char []);
+void dis(char []);
+void display(char []);
+void allbills(char []);
+
+
+
+
+
+void reg()
+{
+	struct details d;
+	char s1[50],s2[50],s3[50];
+	char ch;
+	int i=0,l,c=0;
+
+
+
+	FILE *f;
+	f=fopen("lg","rb");
+	printf("ENTER DETAILS FOR REGISTRATION\n");
+	printf("ENTER USERNAME WITHOUT SPACE\n");
+	fflush(stdin);
+	gets(s1);
+	while(!feof(f))
+	{
+		fread(&d,sizeof(d),1,f);
+		if(strcmp(s1,d.un)==0)
+		{
+		    c++;
+			printf("USERNAME NOT AVAILABE.REGISTER AGAIN WITH ANOTHER USERNAME\n");
+			fclose(f);
+			main();
+			break;
+		}
+	}
+	if(c==0)
+	{
+		fclose(f);
+		f=fopen("lg","ab");
+		printf("ENTER PASSWORD\n");
+		while (1)
+		 {
+         if (i < 0)
+		 {
+         i = 0;
+         }
+         fflush(stdin);
+         ch = getch();
+         if (ch == 13)
+         break;
+         if (ch == 8)
+         {
+         putch('\b');
+         putch('\0');
+         putch('\b');
+         i--;
+         continue;
+         }
+ 		 s2[i++] = ch;
+         ch = '*';
+         putch(ch);
+         }
+
+
+ 		 s2[i] = '\0';
+ 		 i=0;
+		printf("\nRE-ENTER PASSWORD\n");
+		while (1)
+		 {
+         if (i < 0)
+		 {
+         i = 0;
+         }
+         fflush(stdin);
+         ch = getch();
+         if (ch == 13)
+         break;
+         if (ch == 8)
+         {
+         putch('\b');
+         putch('\0');
+         putch('\b');
+         i--;
+         continue;
+         }
+
+         s3[i++] = ch;
+         ch = '*';
+         putch(ch);
+         }
+		s3[i]='\0';
+
+		l=strcmp(s3,s2);
+		if(l==0)
+		{
+			printf("\nYOUR PASSWORD IS SAVED CORRECTLY\n");
+
+		printf("PLEASE ENTER DETAILS:-\n");
+		printf("ENTER PHONR NUMBER\n");
+		fflush(stdin);
+		gets(d.phone);
+		printf("ENTER ADDRESS:-\n");
+		fflush(stdin);
+		printf("ENTER HOUSE NUMBER:-");
+		fflush(stdin);
+		scanf("%d",&d.hn);
+		printf("ENTER CITY NAME:-");
+		fflush(stdin);
+		gets(d.city);
+		strcpy(d.un,s1);strcpy(d.ps,s2);
+		fwrite(&d,sizeof(d),1,f);
+		fclose(f);
+	}
+	else
+	{
+		printf("PASSWORD MISMATCH,TRY AGAIN\n");
+	}
+		main();
+	}
+}
+
+
+
+
+
+void login()
+{
+	int c=0,i=0;
+	char s1[50],s2[50],ch;
+	struct details d;
+	FILE *f;
+	f=fopen("lg","rb");
+
+		printf("ENTER  USERNAME\n");
+	    fflush(stdin);
+		gets(s1);
+		printf("ENTER PASSWORD\n");
+		while (1)
+		 {
+         if (i < 0)
+         i = 0;
+         fflush(stdin);
+         ch = getch();
+         if (ch == 13)
+         break;
+         if (ch == 8)
+         {
+         putch('\b');
+         putch('\0');
+         putch('\b');
+         i--;
+         continue;
+         }
+
+         s2[i++] = ch;
+         ch = '*';
+         putch(ch);
+         }
+		s2[i]='\0';
+
+		i=0;
+		while(!feof(f))
+		{
+			fread(&d,sizeof(d),1,f);
+			if(strcmp(s1,d.un)==0&&strcmp(s2,d.ps)==0)
+			{
+			c++;
+			fclose(f);
+			printf("\nits working\n");
+			menu(s1);
+			break;
+		    }
+
+		}
+			if(c==0)
+			{
+				printf("INVALID USERNAME OR PASSWORD\n");
+				fclose(f);
+				main();
+			}
+
+}
+
+
+
+
+
+
+void menu(char s1[])
+{
+
+	printf("enter c for calculate electrical bill\nenter p for display previous bill\nenter e for a perticular customer bill\nenter q for quit\n");
+	char a;
+	fflush(stdin);
+	scanf("%c",&a);
+	switch(a)
+	{
+		case 'c':
+			cal(s1);
+			break;
+		case 'p':
+		    dis(s1);
+		    break;
+		case 'e':
+			allbills(s1);
+			break;
+	    case 'q':
+	        main();
+
+	}
+}
+
+
+
+
+
+
+
+float cal(char s1[])
+{
+	struct details d;
+	struct detail d1;
+	FILE *p;
+	int unit,c=0;
+    float amount,surcharge,total_amount;
+    printf("\t\t\t***WELCOME TO ELECTRIC BILL CALCULATOR***\n");
+    printf("Enter total units consumed:-");
+    scanf("%d", &unit);
+    if(unit<=10)
+    {
+        amount=0;
+    }
+    else if(unit<=50)
+    {
+        amount=(unit-10)*4;
+    }
+    else if(unit<=100)
+    {
+        amount=160+((unit-50)*6);
+    }
+    else
+    {
+        amount=460+((unit-100)*8);
+    }
+    surcharge=amount*0.20;
+    total_amount=amount+surcharge;
+    printf("%.2f\n",total_amount);
+    p=fopen("bill","ab");
+    	d1.t=total_amount;
+    	strcpy(d1.un1,s1);
+    	fwrite(&d1,sizeof(d1),1,p);
+    fclose(p);
+    menu(s1);
+}
+
+
+
+
+
+
+
+
+
+
+void dis(char s1[])
+{
+	FILE *f;
+	struct details d;
+	int v,y,total_amount;
+	char s4[30],a1;
+
+
+    if(!strcmp(s1,"gurpreet"))
+    {
+    	printf("YOU ARE ABLE TO SEE ALL CUSTOMER DETAILS\n");
+        printf("FOR SEE YOUR PREVIOUS BILL ENTER b\nFOR SEE OTHER CUSTOMER BILL ENTER o\n");
+        fflush(stdin);
+        scanf("%c",&a1);
+        switch(a1)
+        {
+        	case 'b':
+        		display(s1);
+        	case 'o':
+        		allbills(s1);
+
+
+		}
+    }
+    else
+    {
+    	printf("YOU CAN ONLY SEE YOUR DETAILS\n");
+    	display(s1);
+	}
+}
+
+
+
+
+
+
+
+
+
+void display(char s1[])
+{
+	struct details d;
+	struct detail d1;
+	FILE *f,*p;
+	int y;
+	f=fopen("lg","rb");
+    	while(!feof(f))
+    	{
+    		fread(&d,sizeof(d),1,f);
+    		y=strcmp(d.un,s1);
+    		if(y==0)
+    		{
+    			printf("USER NAME:-%s\n",d.un);
+    			printf("PHONE NUMBE:- %s\n",d.phone);
+    			printf("ADDRESS:-\n");
+    			printf("HOUSE NUMBER:-%d\n",d.hn);
+    			printf("CITY:-%s\n",d.city);
+    		}
+		y=1;
+		fclose(f);
+		p=fopen("bill","rb");
+		while(!feof(p))
+		{
+			fread(&d1,sizeof(d1),1,p);
+    		y=strcmp(d1.un1,s1);
+    		if(y==0)
+    		{
+    			printf("BILL IS %g\n",d1.t);
+    			break;
+		    }
+		}
+		fclose(p);
+		menu(s1);
+	}
+}
+
+
+
+
+void allbills(char s1[])
+{
+	char s4[20];
+	FILE *f,*p;
+	struct details d;
+	struct detail d1;
+	int v;
+	printf("ENTER NAME OF CUSTOMER\n");
+    fflush(stdin);
+    gets(s4);
+    f=fopen("lg","rb");
+    fread(&d,sizeof(d),1,f);
+    while(!feof(f))
+    	{
+
+    		v=strcmp(d.un,s4);
+    		if(v==0)
+    		{
+    			printf("USER NAME:-%s\n",d.un);
+    			printf("PHONE NUMBE:- %s\n",d.phone);
+    			printf("ADDRESS:-\n");
+    			printf("HOUSE NUMBER:-%d\n",d.hn);
+    			printf("CITY:-%s\n",d.city);
+			}
+			fread(&d,sizeof(d),1,f);
+		}
+		fclose(f);
+	p=fopen("bill","rb");
+				v=1;
+		while(!feof(p))
+		{
+			fread(&d1,sizeof(d1),1,p);
+    		v=strcmp(d1.un1,s1);
+    		if(v==0)
+    		{
+    			printf("BILL IS %g\n",d1.t);
+    			break;
+		    }
+		}
+		fclose(p);
+			if(v!=0)
+			{
+				printf("USER NOT EXIST\nPLEASE TRY WITH OTHER");
+				dis(s1);
+
+		    }
+
+    menu(s1);
+}
+
+
+
+
+
+main()
+{
+	int c;
+	FILE *f,*p;
+	f=fopen("lg","ab");
+	fclose(f);
+	p=fopen("bill","ab");
+	fclose(p);
+	printf("PRESS\n1-LOGIN\n2-REGISTER\n3-exit\n");
+	scanf("%d",&c);
+	switch(c)
+	{
+		case 1:
+			login();
+			break;
+		case 2:
+		    reg();
+			break;
+		case 3:
+		exit(0);
+	}
+
+
+}
